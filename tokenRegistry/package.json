@@ -1,7 +1,6 @@
 {
   "name": "@wormhole-foundation/sdk-token-registry",
   "version": "0.3.0",
-  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wormhole-foundation/connect-sdk.git"
@@ -20,6 +19,7 @@
     "dist/esm"
   ],
   "scripts": {
+    "prepare": "npm run build",
     "test": "jest --config ../jest.config.ts __tests__/*.ts",
     "build:cjs": "tsc -p ./tsconfig.cjs.json  && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
     "build": "tsc -p ./tsconfig.esm.json",
