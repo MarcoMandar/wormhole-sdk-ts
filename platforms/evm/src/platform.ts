@@ -133,9 +133,16 @@ export class EvmPlatform<N extends Network>
   ): Promise<TxHash[]> {
     const txhashes: TxHash[] = [];
     for (const stxn of stxns) {
-      const txRes = await rpc.broadcastTransaction(stxn);
-      txhashes.push(txRes.hash);
-
+      let txRes;
+      if (chain === 'Oasis') {
+        const { signer, t } = stxn;
+        txRes = await signer.sendTransaction(t);
+        txhashes.push(txRes.hash);
+      }
+      else {
+        txRes = await rpc.broadcastTransaction(stxn);
+        txhashes.push(txRes.hash);
+      }
       if (chain === 'Celo') {
         console.error('TODO: override celo block fetching');
         continue;

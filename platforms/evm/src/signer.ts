@@ -108,16 +108,28 @@ export class EvmNativeSigner<N extends Network, C extends EvmChains = EvmChains>
       const { transaction, description } = txn;
       if (this.opts?.debug)
         console.log(`Signing: ${description} for ${this.address()}`);
-
-      const t: TransactionRequest = {
-        ...transaction,
-        ...{
-          maxFeePerGas,
-          maxPriorityFeePerGas,
-          gasLimit,
-          nonce: await this._signer.getNonce(),
-        },
-      };
+      let t: TransactionRequest = {};
+      if (this.chain() === 'Oasis') {
+        console.log('Oasis');
+        t = {
+          ...transaction,
+          ...{
+            gasPrice: '100000000000',
+            gasLimit: '300000',
+            nonce: await this._signer.getNonce(),
+          },
+        };
+      } else {
+        t = {
+          ...transaction,
+          ...{
+            maxFeePerGas,
+            maxPriorityFeePerGas,
+            gasLimit,
+            nonce: await this._signer.getNonce(),
+          },
+        };
+      }
 
       // try {
       //   const estimate = await this._signer.provider!.estimateGas(t);
@@ -132,7 +144,15 @@ export class EvmNativeSigner<N extends Network, C extends EvmChains = EvmChains>
       //   console.info('Using gas limit: ', t.gasLimit);
       // }
 
-      signed.push(await this._signer.signTransaction(t));
+      if (this.chain() === 'Oasis') {
+        const oasisT = {
+          t,
+          signer: this._signer,
+        };
+        signed.push(oasisT);
+      } else {
+        signed.push(await this._signer.signTransaction(t));
+      }
     }
     return signed;
   }
